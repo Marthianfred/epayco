@@ -11,6 +11,23 @@
 |
 */
 
+
+use LaravelDoctrine\ORM\Facades\EntityManager;
+
 $router->get('/', function () use ($router) {
-    return $router->app->version();
+    //return $router->app->version();
+
+    $repository = EntityManager::getRepository(\App\Entities\Clientes::class);
+    dd($repository);
 });
+
+
+app()->router->get('soap/{key}/server', [
+    'as' => 'zoap.server.wsdl',
+    'uses' => '\Viewflex\Zoap\ZoapController@server'
+]);
+
+app()->router->post('soap/{key}/server', [
+    'as' => 'zoap.server',
+    'uses' => '\Viewflex\Zoap\ZoapController@server'
+]);

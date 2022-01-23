@@ -2,6 +2,7 @@
 
 namespace App\Http\Services;
 
+use App\Entities\Billeteras;
 use App\Http\Services\Types\AuthType;
 use phpDocumentor\Reflection\Types\Array_;
 use SoapFault;
@@ -51,17 +52,25 @@ class EpaycoService
      * @throws SoapFault // Error Genrado Automatico.. u Manual
      */
     public function RegistrarCliente(
+        string $token,
         string $documento,
         string $nombres,
         string $email,
         string $celular
     ):array
     {
+
+        if (is_null(Provider::getToken($token))){
+            header("Status: 401");
+            throw new SoapFault('SOAP-ENV:Client', 'Error en Credenciales');
+        }
+
         $rc = Provider::RegistrarCliente($documento, $nombres, $email, $celular);
 
         if ($rc['status'])
         {
-            return ['status' => 'true', 'msg' => 'Cliente registrado con exito.!', 'cliente'=>$rc['cliente']];
+            // retornamos el usuario
+            return ['status' => 'true', 'msg' => 'Cliente registrado con exito.!', 'cliente'=>$rc['cliente'] , 'billetera'=>$rc['billetera']];
         }
             else
         {

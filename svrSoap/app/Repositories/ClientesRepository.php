@@ -3,7 +3,6 @@
 namespace App\Repositories;
 
 use App\Entities\Clientes;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\ORMException;
 use LaravelDoctrine\ORM\Facades\EntityManager;
 
@@ -25,7 +24,7 @@ class ClientesRepository
     /**
      * @param Clientes $cliente
      * @param array $data
-     * @throws \Doctrine\ORM\ORMException
+     * @throws ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function update(Clientes $cliente, array $data)

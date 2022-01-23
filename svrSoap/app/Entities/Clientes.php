@@ -2,9 +2,11 @@
 
 namespace App\Entities;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping AS ORM;
 use Gedmo\Timestampable\Traits\Timestampable;
+use App\Entities\Billeteras;
 
 /**
  * @ORM\Entity
@@ -12,7 +14,7 @@ use Gedmo\Timestampable\Traits\Timestampable;
  */
 class Clientes
 {
-    use Timestampable;
+    // por si se quiere usar createdAt y updatedAt ///// use Timestampable;
 
     /**
      * @var integer $id
@@ -20,27 +22,27 @@ class Clientes
      * @ORM\GeneratedValue
      * @ORM\Column(name="id", type="integer", unique=true, nullable=false)
      */
-    public $id;
+    protected $id;
 
     /**
     * @ORM\Column(name="documento", type="string", unique=true, nullable=false)
     */
-    public $documento;
+    private $documento;
 
     /**
      * @ORM\Column(name="nombres", type="string", nullable=false)
      */
-    public $nombres;
+    private $nombres;
 
     /**
      * @ORM\Column(name="email", type="string", nullable=false)
      */
-    public $email;
+    private $email;
 
     /**
      * @ORM\Column(name="celular", type="string", nullable=false)
      */
-    public $celular;
+    private $celular;
 
 
     public function __construct($documento, $nombres, $email, $celular)
@@ -86,4 +88,10 @@ class Clientes
     public function setCelular($celular){
         $this->celular = $celular;
     }
+
+    public function getBilleteras()
+    {
+        return $this->Billeteras;
+    }
+
 }

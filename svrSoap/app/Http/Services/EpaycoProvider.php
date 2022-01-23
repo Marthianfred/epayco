@@ -4,7 +4,9 @@
 namespace App\Http\Services;
 
 
+use App\Entities\Billeteras;
 use App\Entities\Clientes;
+use App\Repositories\BilletaraRepository;
 use App\Repositories\ClientesRepository;
 
 class EpaycoProvider
@@ -26,11 +28,11 @@ class EpaycoProvider
      * Returna el Token "string" del "usuario" suministrado.
      *
      * @param string $user
-     * @return string
+     * @return string|null
      */
-    public static function getToken(string $user): string
+    public static function getToken(string $user): ? string
     {
-        return ($user == config('zoap.epayco.user')) ? config('zoap.epayco.token') : '';
+        return ($user == config('zoap.epayco.user')) ? config('zoap.epayco.token') : null;
     }
 
     /**
@@ -109,8 +111,12 @@ class EpaycoProvider
             return ['status'=>false, 'error'=>['code'=>'Error-0006', 'msg'=>'Ya existe un usuario registrado con este Email']];
         }
 
-        $result = $cr->create(new Clientes($Documento,$Nombres,$Email, $Celular));
+        $br = new BilletaraRepository();
+        $gh = $br->generateHash('USD');
+        $cliente = $cr->create(new Clientes($Documento,$Nombres,$Email, $Celular));
 
-        return ['status'=>true, 'cliente'=> $result];
+        $billetera = $br->create(new Billeteras($gh, $cliente->getId(), true, "USD"));
+
+        return ['status'=>true, 'cliente' => $cliente, 'billetera' => $billetera];
     }
 }

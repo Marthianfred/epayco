@@ -12,8 +12,10 @@ use App\Http\Services\Types\Error;
 use App\Http\Services\Types\Cliente;
 use App\Http\Services\Types\ResponseRegistro;
 
+use App\Http\Services\Types\ResponseSoap;
 use App\Repositories\BilletaraRepository;
 use App\Repositories\ClientesRepository;
+use Doctrine\ORM\EntityManager;
 
 class EpaycoProvider
 {
@@ -230,16 +232,16 @@ class EpaycoProvider
     /**
      * Provider para buscar Documento
      * @param string $documento
-     * @return array
+     * @return ResponseSoap
      */
-        public static function BuscarDocumento(string $documento):array{
+        public static function BuscarDocumento(string $documento):ResponseSoap{
         if (!$documento){
-            return ['status'=>false, 'error'=>['code'=>'Error-0010', 'msg'=>'El Documento a Buscar no puede ser Nulo']];
+            return new ResponseSoap(false, new Error('Error-0010', 'El Documento a Buscar no puede ser Nulo'),[]);
         }
 
-        $result = ClientesRepository::FinByDoc($documento)[0];
+        $result = ClientesRepository::FinByDoc($documento);
         if (!$result){
-            return ['status'=>false, 'error'=>['code'=>'Error-0011', 'msg'=>'El Documento a Buscar no Existe']];
+            return new ResponseSoap(false, new Error('Error-0011', 'El Documento a Buscar no Existe'), []);
         }
 
         $c = [
@@ -251,7 +253,7 @@ class EpaycoProvider
         ];
 
         //lo expongo como Array por si.... es posible que un cliente mismo doc tenga varias cuentas
-        return ['status'=>true, 'cliente'=>$c];
+        return new ResponseSoap(true,new Error(), $c);
 
     }
 
@@ -259,16 +261,16 @@ class EpaycoProvider
      * Provider para buscar Email
      *
      * @param string $email
-     * @return array
+     * @return ResponseSoap
      */
-    public static function BuscarEmail(string $email):array{
+    public static function BuscarEmail(string $email):ResponseSoap{
         if (!$email){
             return ['status'=>false, 'error'=>['code'=>'Error-0012', 'msg'=>'El Email a Buscar no puede ser Nulo']];
         }
 
-        $result = ClientesRepository::FinByEmail($email)[0];
+        $result = ClientesRepository::FinByEmail($email);
         if (!$result){
-            return ['status'=>false, 'error'=>['code'=>'Error-0013', 'msg'=>'El Email a Buscar no Existe']];
+            return new ResponseSoap(false, new Error('Error-0013', 'El Email a Buscar no Existe'),[]);
         }
 
         $c = [
@@ -280,7 +282,78 @@ class EpaycoProvider
         ];
 
         //lo expongo como Array por si.... es posible que un cliente mismo doc tenga varias cuentas
-        return ['status'=>true, 'cliente'=>$c];
+        return new ResponseSoap(true,new Error(), $c);
 
+    }
+
+    /**
+     * Provider Actualizar Cliente
+     * @param string $Documento
+     * @param string $Nombres
+     * @param string $Celular
+     * @param string $Password
+     * @return ResponseSoap
+     */
+    public static function ActualizarCliente(
+        array $data
+    ): ResponseSoap{
+
+        if (!$data['Documento']){
+            return new ResponseSoap(
+                false,
+                new Error(
+                    'Error-0001',
+                    'El Documento no puede ser Nullo'),
+                []
+            );
+        }
+        if (!$data['Nombres']){
+            return new ResponseSoap(
+                false,
+                new Error(
+                    'Error-0002',
+                    'Los Nombres no pueden ser Nullo'),
+                []
+            );
+        }
+        if (!$data['Celular']){
+            return new ResponseSoap(
+                false,
+                new Error(
+                    'Error-0004',
+                    'El numero Celular no puede ser Nullo'
+                ),
+                []
+            );
+        }
+        if (!$data['Password']){
+            return new ResponseSoap(
+                false,
+                new Error(
+                    'Error-0007',
+                    'el password no puede ser nulo'
+                ),
+                []
+            );
+        }
+
+        // Buscamos segun Documento
+        $cliente = ClientesRepository::FinByDoc($data['Documento']);
+
+        if (!$cliente){
+            return new ResponseSoap(false, new Error('Error-0011', 'El Documento a Buscar no Existe'), []);
+        }
+
+        $update = ClientesRepository::update($cliente, $data);
+
+        $r = [
+            'id' => $update->getId(),
+            'documento' => $update->getDocumento(),
+            'nombres' => $update->getNombres(),
+            'email' => $update->getEmail(),
+            'celular' => $update->getCelular(),
+
+        ];
+        return new ResponseSoap(true,new Error(), $r);
     }
 }

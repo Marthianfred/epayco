@@ -152,16 +152,16 @@ class EpaycoService
 
         $bb = Provider::BuscarDocumento($documento);
 
-        if ($bb['status'])
+        if ($bb->status)
         {
             header("Status: 200");
             // retornamos la Billetera
-            return ['status' => 'true', 'msg' => 'Billetera encontrada.!', 'cliente'=>$bb['cliente']];
+            return ['status' => 'true', 'msg' => 'Billetera encontrada.!', 'cliente'=>$bb->result];
         }
 
         else
         {
-            $this->generarError($bb['error']['code']. ': ' . $bb['error']['msg']);
+            $this->generarError($bb->error->codigo. ': ' . $bb->error->descripcion);
         }
     }
 
@@ -186,17 +186,65 @@ class EpaycoService
 
         $bb = Provider::BuscarEmail($email);
 
-        if ($bb['status'])
+        if ($bb->status)
         {
             header("Status: 200");
             // retornamos la Billetera
-            return ['status' => 'true', 'msg' => 'Billetera encontrada.!', 'cliente'=>$bb['cliente']];
+            return ['status' => $bb->status, 'msg' => 'Cliente encontrado.!', 'cliente'=>$bb->result];
         }
 
         else
         {
-            $this->generarError($bb['error']['code']. ': ' . $bb['error']['msg']);
+            $this->generarError($bb->error->codigo . ': ' . $bb->error->descripcion);
         }
+    }
+
+    /**
+     * Funcion Actualizar Cliente
+     * El Criterio de Busqueda es Documento no se permite actualizar el email
+     *
+     * @param string $user
+     * @param string $token
+     * @param string $documento
+     * @param string $nombres
+     * @param string $celular
+     * @param string $password
+     * @return array
+     */
+    public function ActualizarCliente(
+        string $user,
+        string $token,
+        string $documento,
+        string $nombres,
+        string $celular,
+        string $password
+    ):array
+    {
+
+        if ($token != Provider::getToken($user)){
+            header("Status: 401");
+            throw new SoapFault('SOAP-ENV:Client', 'Error en Credenciales');
+        }
+
+        $cliente = Provider::ActualizarCliente(
+            [
+                'Documento'=>$documento,
+                'Nombres' =>$nombres,
+                'Celular' => $celular,
+                'Password'=> $password
+            ]);
+
+
+        if ($cliente->status)
+        {
+            return ['status'=>$cliente->status, 'msg'=>'El cliente fue actualizado!', 'cliente'=> $cliente->result];
+        }
+
+        else
+        {
+            $this->generarError($cliente->error->codigo. ': ' . $cliente->error->descripcion);
+        }
+
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Entities\Clientes;
 use Doctrine\ORM\ORMException;
+use Illuminate\Support\Facades\Hash;
 use LaravelDoctrine\ORM\Facades\EntityManager;
 
 class ClientesRepository
@@ -24,17 +25,18 @@ class ClientesRepository
     /**
      * @param Clientes $cliente
      * @param array $data
-     * @throws ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     *
+     * @return Clientes
      */
-    public function update(Clientes $cliente, array $data)
+    public static function update(Clientes $cliente, array $data): Clientes
     {
-        $cliente->setDocumento($data['documento']);
-        $cliente->setNombres($data['nombres']);
-        $cliente->setEmail($data['email']);
-        $cliente->setCelular($data['celular']);
+        $cliente->setNombres($data['Nombres']);
+        $cliente->setCelular($data['Celular']);
+        $cliente->setPassword(Hash::make($data['Password']));
         EntityManager::persist($cliente);
         EntityManager::flush();
+
+        return $cliente;
     }
 
     /**
@@ -69,11 +71,11 @@ class ClientesRepository
      * Funcion que Busca un Cliente por Documento
      *
      * @param $doc
-     * @return object[]
+     * @return Clientes|null
      */
-    public static function FinByDoc($doc)
+    public static function FinByDoc($doc):?Clientes
     {
-        $r = EntityManager::getRepository(Clientes::class)->findBy(['documento'=>$doc]);
+        $r= EntityManager::getRepository(Clientes::class)->findBy(['documento'=>$doc])[0];
         return $r;
     }
 
@@ -99,11 +101,11 @@ class ClientesRepository
      * funcion que busca un Cliente por Email
      *
      * @param $email
-     * @return object[]
+     * @return Clientes|null
      */
-    public static function finByEmail($email)
+    public static function finByEmail($email):?Clientes
     {
-        $r = EntityManager::getRepository(Clientes::class)->findBy(['email'=>$email]);
+        $r = EntityManager::getRepository(Clientes::class)->findBy(['email'=>$email])[0];
         return $r;
     }
 

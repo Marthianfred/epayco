@@ -13,7 +13,7 @@ class ClientesRepository
      * @param Clientes $cliente
      * @return Clientes
      */
-    public function create(Clientes $cliente)
+    public static function crear(Clientes $cliente): Clientes
     {
         EntityManager::persist($cliente);
         EntityManager::flush();
@@ -48,7 +48,6 @@ class ClientesRepository
         ]);
     }
 
-
     /**
      * Esta Funcion Valida si el documento ya existe
      * retorna un Bool para si o no
@@ -57,14 +56,25 @@ class ClientesRepository
      * @param $id
      * @return bool
      */
-    public function isDocumento($doc):bool
+    public static function isDocumento($doc):bool
     {
         $r = EntityManager::getRepository(Clientes::class)->findOneBy(['documento'=>$doc]);
         if ($r){
             return true;
         }
-
         return false;
+    }
+
+    /**
+     * Funcion que Busca un Cliente por Documento
+     *
+     * @param $doc
+     * @return object[]
+     */
+    public static function FinByDoc($doc)
+    {
+        $r = EntityManager::getRepository(Clientes::class)->findBy(['documento'=>$doc]);
+        return $r;
     }
 
     /**
@@ -75,7 +85,7 @@ class ClientesRepository
      * @param $id
      * @return bool
      */
-    public function isEmail($email):bool
+    public static function isEmail($email):bool
     {
         $r = EntityManager::getRepository(Clientes::class)->findOneBy(['email'=>$email]);
         if ($r){
@@ -83,6 +93,18 @@ class ClientesRepository
         }
 
         return false;
+    }
+
+    /**
+     * funcion que busca un Cliente por Email
+     *
+     * @param $email
+     * @return object[]
+     */
+    public static function finByEmail($email)
+    {
+        $r = EntityManager::getRepository(Clientes::class)->findBy(['email'=>$email]);
+        return $r;
     }
 
     /**

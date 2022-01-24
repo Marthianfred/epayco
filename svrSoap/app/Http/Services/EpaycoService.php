@@ -2,9 +2,6 @@
 
 namespace App\Http\Services;
 
-use App\Entities\Billeteras;
-use App\Http\Services\Types\AuthType;
-use phpDocumentor\Reflection\Types\Array_;
 use SoapFault;
 use App\Http\Services\EpaycoProvider as Provider;
 
@@ -52,6 +49,7 @@ class EpaycoService
      * @throws SoapFault // Error Genrado Automatico.. u Manual
      */
     public function RegistrarCliente(
+        string $user,
         string $token,
         string $documento,
         string $nombres,
@@ -59,8 +57,7 @@ class EpaycoService
         string $celular
     ):array
     {
-
-        if (is_null(Provider::getToken($token))){
+        if ($token != Provider::getToken($user)){
             header("Status: 401");
             throw new SoapFault('SOAP-ENV:Client', 'Error en Credenciales');
         }
@@ -69,14 +66,127 @@ class EpaycoService
 
         if ($rc['status'])
         {
+            header("Status: 201");
             // retornamos el usuario
             return ['status' => 'true', 'msg' => 'Cliente registrado con exito.!', 'cliente'=>$rc['cliente'] , 'billetera'=>$rc['billetera']];
         }
             else
         {
-            header("Status: 400");
-            //code o msg ver EpaycoProvider
-            throw new SoapFault('SOAP-ENV:Client', $rc['error']['code']. ': ' . $rc['error']['msg']);
+            $this->generarError($rc['error']['code']. ': ' . $rc['error']['msg']);
         }
+    }
+
+    /**
+     * Funcion para buscar una Billetera segun su HASH
+     * @param string $user
+     * @param string $token
+     * @param string $hash
+     * @return array
+     * @throws SoapFault
+     */
+    public function BuscarBilleteraHASH(
+        string $user,
+        string $token,
+        string $hash
+    ):array
+    {
+        if ($token != Provider::getToken($user)){
+            header("Status: 401");
+            throw new SoapFault('SOAP-ENV:Client', 'Error en Credenciales');
+        }
+
+        $bb = Provider::BuscarHASH($hash);
+
+        if ($bb['status'])
+        {
+            header("Status: 200");
+            // retornamos la Billetera
+            return ['status' => 'true', 'msg' => 'Billetera encontrada.!', 'billetera'=>$bb['billeteras']];
+        }
+
+        else
+        {
+            $this->generarError($bb['error']['code']. ': ' . $bb['error']['msg']);
+        }
+    }
+
+    /**
+     * Funcion para buscar Clientes segun su Documento
+     * @param string $user
+     * @param string $token
+     * @param string $hash
+     * @return array
+     * @throws SoapFault
+     */
+    public function BuscarClientesDOCUMENTO(
+        string $user,
+        string $token,
+        string $documento
+    ):array
+    {
+        if ($token != Provider::getToken($user)){
+            header("Status: 401");
+            throw new SoapFault('SOAP-ENV:Client', 'Error en Credenciales');
+        }
+
+        $bb = Provider::BuscarDocumento($documento);
+
+        if ($bb['status'])
+        {
+            header("Status: 200");
+            // retornamos la Billetera
+            return ['status' => 'true', 'msg' => 'Billetera encontrada.!', 'cliente'=>$bb['cliente']];
+        }
+
+        else
+        {
+            $this->generarError($bb['error']['code']. ': ' . $bb['error']['msg']);
+        }
+    }
+
+    /**
+     * Funcion para buscar Clientes segun su Email
+     * @param string $user
+     * @param string $token
+     * @param string $hash
+     * @return array
+     * @throws SoapFault
+     */
+    public function BuscarClientesEMAIL(
+        string $user,
+        string $token,
+        string $email
+    ):array
+    {
+        if ($token != Provider::getToken($user)){
+            header("Status: 401");
+            throw new SoapFault('SOAP-ENV:Client', 'Error en Credenciales');
+        }
+
+        $bb = Provider::BuscarEmail($email);
+
+        if ($bb['status'])
+        {
+            header("Status: 200");
+            // retornamos la Billetera
+            return ['status' => 'true', 'msg' => 'Billetera encontrada.!', 'cliente'=>$bb['cliente']];
+        }
+
+        else
+        {
+            $this->generarError($bb['error']['code']. ': ' . $bb['error']['msg']);
+        }
+    }
+
+    /**
+     *
+     * @param string $code
+     * @param string $msg
+     *
+     * @throws SoapFault
+     */
+    private function generarError(string $msg , string $code = "SOAP-ENV:Client"){
+        header("Status: 400");
+        throw new SoapFault($code, $msg);
     }
 }

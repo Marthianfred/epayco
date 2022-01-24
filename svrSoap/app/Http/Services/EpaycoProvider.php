@@ -8,6 +8,7 @@ use App\Entities\Billeteras;
 use App\Entities\Clientes;
 use App\Repositories\BilletaraRepository;
 use App\Repositories\ClientesRepository;
+use LaravelDoctrine\ORM\Facades\EntityManager;
 
 class EpaycoProvider
 {
@@ -32,7 +33,7 @@ class EpaycoProvider
      */
     public static function getToken(string $user): ? string
     {
-        return ($user == config('zoap.epayco.user')) ? config('zoap.epayco.token') : null;
+        return ($user === config('zoap.epayco.user')) ? config('zoap.epayco.token') : null;
     }
 
     /**
@@ -78,7 +79,6 @@ class EpaycoProvider
      *
      * @return array
      */
-
     public static function RegistrarCliente(
         string $Documento,
         string $Nombres,
@@ -101,22 +101,115 @@ class EpaycoProvider
             return ['status'=>false, 'error'=>['code'=>'Error-0004', 'msg'=>'El numero Celular no puede ser Nullo']];
         }
 
-        $cr = new ClientesRepository();
-
-        if ($cr->isDocumento($Documento)){
+        if (ClientesRepository::isDocumento($Documento)){
             return ['status'=>false, 'error'=>['code'=>'Error-0005', 'msg'=>'Ya existe un usuario registrado con este Documento']];
         }
 
-        if ($cr->isEmail($Email)){
+        if (ClientesRepository::isEmail($Email)){
             return ['status'=>false, 'error'=>['code'=>'Error-0006', 'msg'=>'Ya existe un usuario registrado con este Email']];
         }
 
-        $br = new BilletaraRepository();
-        $gh = $br->generateHash('USD');
-        $cliente = $cr->create(new Clientes($Documento,$Nombres,$Email, $Celular));
+        $cliente = new Clientes($Documento,$Nombres,$Email, $Celular);
+        $cliente->AgragarBilletera(new Billeteras(BilletaraRepository::generateHash("USD")));
 
-        $billetera = $br->create(new Billeteras($gh, $cliente->getId(), true, "USD"));
+        $result = ClientesRepository::crear($cliente);
 
-        return ['status'=>true, 'cliente' => $cliente, 'billetera' => $billetera];
+        // se toma encuenta la primera... un cliente asume que puede tener diferentes Billeteras
+        // en este Ejmplo de Ilustracion solo estoy tratando con 1 sola "USD"
+        $billetera = $result->getBilleteras()->first();
+
+        // se pudo llamar a new Clientes() para crear el objecto
+        // mas dicidi dejarlo asi como ejemplo a Valores que se retornan en el SOAP
+        // a mano
+        $c = [
+            'id' => $result->getId(),
+            'documento' => $result->getDocumento(),
+            'nombres' => $result->getNombres(),
+            'email' => $result->getEmail(),
+            'celular' => $result->getCelular(),
+            'billetera' => [
+                'id' => $billetera->getId(), // id de la Billetera
+                'hash' => $billetera->getHash(), // Hash de la Billetera
+                'currency' => $billetera->getCurrency(), // Moneda de la Billetera
+                'status' => $billetera->getStatus(), // Estado de la Billetera
+
+            ]
+        ];
+
+
+        return ['status'=>true, 'cliente' => $c];
+    }
+
+    /**
+     * Busca el hash en la Billetera del cliente
+     * @param string $hash
+     * @return array
+     */
+    public static function BuscarHASH(string $hash):array
+    {
+        if (!$hash){
+            return ['status'=>false, 'error'=>['code'=>'Error-0007', 'msg'=>'El hash a Buscar no puede ser Nulo']];
+        }
+
+        $billetera = BilletaraRepository::findByHash($hash);
+
+        if (!$billetera){
+            return ['status'=>false, 'error'=>['code'=>'Error-0008', 'msg'=>'El hash a Buscar no existe']];
+        }
+
+        $result = [
+            'id' => $billetera[0]->getId(),
+            'hash' => $billetera[0]->getHash(),
+            'currency' => $billetera[0]->getCurrency(),
+            'status' => $billetera[0]->getStatus()
+        ];
+
+        return ['status'=>true, 'billeteras'=> $result];
+    }
+
+    public static function BuscarDocumento(string $documento):array{
+        if (!$documento){
+            return ['status'=>false, 'error'=>['code'=>'Error-0009', 'msg'=>'El Documento a Buscar no puede ser Nulo']];
+        }
+
+        $result = ClientesRepository::FinByDoc($documento)[0];
+        if (!$result){
+            return ['status'=>false, 'error'=>['code'=>'Error-0010', 'msg'=>'El Documento a Buscar no Existe']];
+        }
+
+        $c = [
+            'id' => $result->getId(),
+            'documento' => $result->getDocumento(),
+            'nombres' => $result->getNombres(),
+            'email' => $result->getEmail(),
+            'celular' => $result->getCelular(),
+        ];
+
+        //lo expongo como Array por si.... es posible que un cliente mismo doc tenga varias cuentas
+        return ['status'=>true, 'cliente'=>$c];
+
+    }
+
+    public static function BuscarEmail(string $email):array{
+        if (!$email){
+            return ['status'=>false, 'error'=>['code'=>'Error-0011', 'msg'=>'El Email a Buscar no puede ser Nulo']];
+        }
+
+        $result = ClientesRepository::FinByEmail($email)[0];
+        if (!$result){
+            return ['status'=>false, 'error'=>['code'=>'Error-0012', 'msg'=>'El Email a Buscar no Existe']];
+        }
+
+        $c = [
+            'id' => $result->getId(),
+            'documento' => $result->getDocumento(),
+            'nombres' => $result->getNombres(),
+            'email' => $result->getEmail(),
+            'celular' => $result->getCelular(),
+        ];
+
+        //lo expongo como Array por si.... es posible que un cliente mismo doc tenga varias cuentas
+        return ['status'=>true, 'cliente'=>$c];
+
     }
 }

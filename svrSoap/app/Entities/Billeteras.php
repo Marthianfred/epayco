@@ -3,6 +3,8 @@
 
 namespace App\Entities;
 
+use App\Entities\Clientes;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping AS ORM;
 
 /**
@@ -28,10 +30,10 @@ class Billeteras
     private $hash;
 
     /**
-     * @var integer $user_id
-     * @ORM\Column(name="user_id", type="integer", unique=true, nullable=false)
+     * @ORM\ManyToOne(targetEntity="Clientes", inversedBy="Billeteras")
+     * @var Clientes
      */
-    private $user_id;
+    private $clientes;
 
     /**
      * @var bool $status
@@ -45,15 +47,19 @@ class Billeteras
      */
     private $currency;
 
-
-    public function __construct($hash, $user_id, $status, $currency)
+    /**
+     * Billeteras constructor.
+     * @param string $hash
+     * @param bool $status
+     * @param string $currency
+     */
+    public function __construct(string $hash, bool $status = true, string $currency = "USD")
     {
         $this->hash = $hash;
-        $this->user_id = $user_id;
         $this->status = $status;
         $this->currency = $currency;
-
     }
+
 
     public function getId(){
         return $this->id;
@@ -65,14 +71,6 @@ class Billeteras
 
     public function setHash($hash){
         $this->hash = $hash;
-    }
-
-    public function getUserId(){
-        return $this->user_id;
-    }
-
-    public function setUserId($user_id){
-        $this->user_id = $user_id;
     }
 
     public function getStatus(){
@@ -89,6 +87,16 @@ class Billeteras
 
     public function setCurrency($currency){
         $this->currency = $currency;
+    }
+
+    public function getClientes()
+    {
+        return $this->clientes;
+    }
+
+    public function setCliente(Clientes $cliente)
+    {
+        $this->clientes = $cliente;
     }
 
 }

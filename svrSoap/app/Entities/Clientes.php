@@ -3,10 +3,7 @@
 namespace App\Entities;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping AS ORM;
-use Gedmo\Timestampable\Traits\Timestampable;
-use App\Entities\Billeteras;
 
 /**
  * @ORM\Entity
@@ -44,6 +41,12 @@ class Clientes
      */
     private $celular;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Billeteras", mappedBy="Clientes", cascade={"persist"})
+     * @var ArrayCollection|Billeteras[]
+     */
+    private $billeteras;
+
 
     public function __construct($documento, $nombres, $email, $celular)
     {
@@ -51,6 +54,8 @@ class Clientes
         $this->nombres = $nombres;
         $this->email = $email;
         $this->celular = $celular;
+
+        $this->billeteras = new ArrayCollection();
     }
 
     public function getId(){
@@ -91,7 +96,18 @@ class Clientes
 
     public function getBilleteras()
     {
-        return $this->Billeteras;
+        return $this->billeteras;
+    }
+
+    public function AgragarBilletera(Billeteras $billetera){
+        if(!$this->billeteras->contains($billetera)) {
+            $billetera->setCliente($this);
+            $this->billeteras->add($billetera);
+        }
+    }
+
+    public function setBilleteras(Billeteras $b){
+        $this->billeteras = $b;
     }
 
 }

@@ -10,8 +10,11 @@ return [
             ],
             'types' => [
                 'KeyValue' => 'App\Http\Services\Types\KeyValue',
-                'ResponseSoap' => 'App\Http\Services\Types\ResponseSoap',
+                //'ResponseSoap' => 'App\Http\Services\Types\ResponseSoap',
+                'ResponseRegistro' => 'App\Http\Services\Types\ResponseRegistro',
                 'Error' => 'App\Http\Services\Types\Error',
+                'Cliente' => 'App\Http\Services\Types\Cliente',
+                'Billetera' => 'App\Http\Services\Types\Billetera',
             ],
             'strategy' => 'ArrayOfTypeComplex',
             'headers' => [

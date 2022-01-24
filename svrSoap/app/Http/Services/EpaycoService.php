@@ -2,6 +2,8 @@
 
 namespace App\Http\Services;
 
+use App\Http\Services\Types\Error;
+use App\Http\Services\Types\ResponseRegistro;
 use App\Http\Services\Types\ResponseSoap;
 use SoapFault;
 use App\Http\Services\EpaycoProvider as Provider;
@@ -70,8 +72,24 @@ class EpaycoService
         if ($rc->status)
         {
             header("Status: 201");
-            // retornamos el usuario
-            return ['status' => 'true', 'msg' => 'Cliente registrado con exito.!', 'cliente'=>$rc['cliente'] , 'billetera'=>$rc['billetera']];
+
+            return [
+                'status'=>$rc->status,
+                'msg' => 'Usuario Registrado con Exito',
+                'cliente' =>[
+                    'id' => $rc->cliente->id,
+                    'documento' => $rc->cliente->documento,
+                    'nombres' => $rc->cliente->nombres,
+                    'email' => $rc->cliente->email,
+                    'celular' => $rc->cliente->celular,
+                    'billetera' =>[
+                        'id' => $rc->cliente->billetera->id,
+                        'hash' => $rc->cliente->billetera->hash,
+                        'currency' => $rc->cliente->billetera->currency,
+                        'status' => $rc->cliente->billetera->status
+                    ]
+                ]
+            ];
         }
             else
         {

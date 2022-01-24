@@ -10,7 +10,8 @@ return [
             ],
             'types' => [
                 'KeyValue' => 'App\Http\Services\Types\KeyValue',
-                'Auth' => 'App\Http\Services\Types\AuthType',
+                'ResponseSoap' => 'App\Http\Services\Types\ResponseSoap',
+                'Error' => 'App\Http\Services\Types\Error',
             ],
             'strategy' => 'ArrayOfTypeComplex',
             'headers' => [

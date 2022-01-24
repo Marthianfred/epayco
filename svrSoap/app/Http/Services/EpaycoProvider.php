@@ -6,6 +6,8 @@ namespace App\Http\Services;
 
 use App\Entities\Billeteras;
 use App\Entities\Clientes;
+use App\Http\Services\Types\Error;
+use App\Http\Services\Types\ResponseSoap;
 use App\Repositories\BilletaraRepository;
 use App\Repositories\ClientesRepository;
 use LaravelDoctrine\ORM\Facades\EntityManager;
@@ -76,8 +78,9 @@ class EpaycoProvider
      * @param string $Nombres
      * @param string $Email
      * @param string $Celular
+     * @param string $Password
      *
-     * @return array
+     * @return ResponseSoap
      */
     public static function RegistrarCliente(
         string $Documento,
@@ -85,31 +88,31 @@ class EpaycoProvider
         string $Email,
         string $Celular,
         string $Password
-    ):array
+    ): ResponseSoap
     {
         //logica con Doctrine para crear usuarios
         if (!$Documento){
-            return ['status'=>false, 'error'=>['code'=>'Error-0001', 'msg'=>'El Documento no puede ser Nullo']];
+            return new ResponseSoap(false, new Error('Error-0001', 'El Documento no puede ser Nullo'),[]);
         }
         if (!$Nombres){
-            return ['status'=>false, 'error'=>['code'=>'Error-0002', 'msg'=>'Los Nombres no pueden ser Nullo']];
+            return new ResponseSoap(false, new Error('Error-0002', 'Los Nombres no pueden ser Nullo'),[]);
         }
         if (!$Email){
-            return ['status'=>false, 'error'=>['code'=>'Error-0003', 'msg'=>'La Dirección E-mail no puede ser Nullo']];
+            return new ResponseSoap(false, new Error('Error-0003', 'La Dirección E-mail no puede ser Nullo'),[]);
         }
         if (!$Celular){
-            return ['status'=>false, 'error'=>['code'=>'Error-0004', 'msg'=>'El numero Celular no puede ser Nullo']];
+            return new ResponseSoap(false, new Error('Error-0004', 'El numero Celular no puede ser Nullo'),[]);
         }
 
         if (ClientesRepository::isDocumento($Documento)){
-            return ['status'=>false, 'error'=>['code'=>'Error-0005', 'msg'=>'Ya existe un usuario registrado con este Documento']];
+            return new ResponseSoap(false, new Error('Error-0005', 'Ya existe un usuario registrado con este Documento'),[]);
         }
 
         if (ClientesRepository::isEmail($Email)){
-            return ['status'=>false, 'error'=>['code'=>'Error-0006', 'msg'=>'Ya existe un usuario registrado con este Email']];
+            return new ResponseSoap(false, new Error('Error-0006', 'Ya existe un usuario registrado con este Email'),[]);
         }
         if (!$Password){
-            return ['status'=>false, 'error'=>['code'=>'Error-0007', 'msg'=>'el password no puede ser nulo']];
+            return new ResponseSoap(false, new Error('Error-0007', 'el password no puede ser nulo'),[]);
         }
 
         $cliente = new Clientes($Documento,$Nombres,$Email, $Celular,$Password);
@@ -136,12 +139,10 @@ class EpaycoProvider
                 'hash' => $billetera->getHash(), // Hash de la Billetera
                 'currency' => $billetera->getCurrency(), // Moneda de la Billetera
                 'status' => $billetera->getStatus(), // Estado de la Billetera
-
             ]
         ];
 
-
-        return ['status'=>true, 'cliente' => $c];
+        return new ResponseSoap(true, new Error(),$c);
     }
 
     /**

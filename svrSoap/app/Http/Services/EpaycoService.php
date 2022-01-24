@@ -2,6 +2,7 @@
 
 namespace App\Http\Services;
 
+use App\Http\Services\Types\ResponseSoap;
 use SoapFault;
 use App\Http\Services\EpaycoProvider as Provider;
 
@@ -46,7 +47,7 @@ class EpaycoService
      * @param string $celular
      * @param string $password
      *
-     * @return array // [Status, msg, cliente]
+     * @return array
      * @throws SoapFault // Error Genrado Automatico.. u Manual
      */
     public function RegistrarCliente(
@@ -66,7 +67,7 @@ class EpaycoService
 
         $rc = Provider::RegistrarCliente($documento, $nombres, $email, $celular, $password);
 
-        if ($rc['status'])
+        if ($rc->status)
         {
             header("Status: 201");
             // retornamos el usuario
@@ -74,7 +75,7 @@ class EpaycoService
         }
             else
         {
-            $this->generarError($rc['error']['code']. ': ' . $rc['error']['msg']);
+            $this->generarError($rc->error->codigo. ': ' . $rc->error->descripcion);
         }
     }
 

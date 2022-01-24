@@ -83,10 +83,10 @@ class EpaycoProvider
         string $Documento,
         string $Nombres,
         string $Email,
-        string $Celular
+        string $Celular,
+        string $Password
     ):array
     {
-
         //logica con Doctrine para crear usuarios
         if (!$Documento){
             return ['status'=>false, 'error'=>['code'=>'Error-0001', 'msg'=>'El Documento no puede ser Nullo']];
@@ -108,9 +108,13 @@ class EpaycoProvider
         if (ClientesRepository::isEmail($Email)){
             return ['status'=>false, 'error'=>['code'=>'Error-0006', 'msg'=>'Ya existe un usuario registrado con este Email']];
         }
+        if (!$Password){
+            return ['status'=>false, 'error'=>['code'=>'Error-0007', 'msg'=>'el password no puede ser nulo']];
+        }
 
-        $cliente = new Clientes($Documento,$Nombres,$Email, $Celular);
-        $cliente->AgragarBilletera(new Billeteras(BilletaraRepository::generateHash("USD")));
+        $cliente = new Clientes($Documento,$Nombres,$Email, $Celular,$Password);
+
+        $cliente->AgragarBilletera(new Billeteras(strtoupper(BilletaraRepository::generateHash("USD"))));
 
         $result = ClientesRepository::crear($cliente);
 
@@ -148,13 +152,13 @@ class EpaycoProvider
     public static function BuscarHASH(string $hash):array
     {
         if (!$hash){
-            return ['status'=>false, 'error'=>['code'=>'Error-0007', 'msg'=>'El hash a Buscar no puede ser Nulo']];
+            return ['status'=>false, 'error'=>['code'=>'Error-0008', 'msg'=>'El hash a Buscar no puede ser Nulo']];
         }
 
         $billetera = BilletaraRepository::findByHash($hash);
 
         if (!$billetera){
-            return ['status'=>false, 'error'=>['code'=>'Error-0008', 'msg'=>'El hash a Buscar no existe']];
+            return ['status'=>false, 'error'=>['code'=>'Error-0009', 'msg'=>'El hash a Buscar no existe']];
         }
 
         $result = [
@@ -167,14 +171,19 @@ class EpaycoProvider
         return ['status'=>true, 'billeteras'=> $result];
     }
 
-    public static function BuscarDocumento(string $documento):array{
+    /**
+     * Provider para buscar Documento
+     * @param string $documento
+     * @return array
+     */
+        public static function BuscarDocumento(string $documento):array{
         if (!$documento){
-            return ['status'=>false, 'error'=>['code'=>'Error-0009', 'msg'=>'El Documento a Buscar no puede ser Nulo']];
+            return ['status'=>false, 'error'=>['code'=>'Error-0010', 'msg'=>'El Documento a Buscar no puede ser Nulo']];
         }
 
         $result = ClientesRepository::FinByDoc($documento)[0];
         if (!$result){
-            return ['status'=>false, 'error'=>['code'=>'Error-0010', 'msg'=>'El Documento a Buscar no Existe']];
+            return ['status'=>false, 'error'=>['code'=>'Error-0011', 'msg'=>'El Documento a Buscar no Existe']];
         }
 
         $c = [
@@ -190,14 +199,20 @@ class EpaycoProvider
 
     }
 
+    /**
+     * Provider para buscar Email
+     *
+     * @param string $email
+     * @return array
+     */
     public static function BuscarEmail(string $email):array{
         if (!$email){
-            return ['status'=>false, 'error'=>['code'=>'Error-0011', 'msg'=>'El Email a Buscar no puede ser Nulo']];
+            return ['status'=>false, 'error'=>['code'=>'Error-0012', 'msg'=>'El Email a Buscar no puede ser Nulo']];
         }
 
         $result = ClientesRepository::FinByEmail($email)[0];
         if (!$result){
-            return ['status'=>false, 'error'=>['code'=>'Error-0012', 'msg'=>'El Email a Buscar no Existe']];
+            return ['status'=>false, 'error'=>['code'=>'Error-0013', 'msg'=>'El Email a Buscar no Existe']];
         }
 
         $c = [

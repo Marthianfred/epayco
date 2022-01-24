@@ -1,28 +1,36 @@
 {
 	"info": {
-		"_postman_id": "df45e902-8c00-ebee-dc4a-1dd45c4aae62",
+		"_postman_id": "599496c3-b9bb-4f51-a7f4-237b15ec5cd7",
 		"name": "Soap Epayco TEST",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
 			"name": "wsdl",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Complex type 'ArrayOfProduct' was discovered\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"tns:ArrayOfProduct\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
 			"request": {
 				"auth": {
 					"type": "noauth"
 				},
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "firstName",
-							"value": "Adam",
-							"type": "text"
-						}
-					]
-				},
 				"url": {
 					"raw": "{{domain}}/soap/epayco/server?wsdl",
 					"host": [
@@ -36,7 +44,7 @@
 					"query": [
 						{
 							"key": "wsdl",
-							"value": null
+							"value": ""
 						}
 					]
 				}
@@ -49,7 +57,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "b4297775-2f9e-43bd-ace5-86404391d0f4",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -87,7 +94,18 @@
 			"response": []
 		},
 		{
-			"name": "RegistrarCliente",
+			"name": "Registrar Cliente",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -98,7 +116,76 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:oper=\"{{domain}}/soap/epayco/server\">\n    <soapenv:Header/>\n    <soapenv:Body>\n        <oper:RegistrarCliente>\n            <oper:token>{{token}}</oper:token>\n            <oper:documento>{{documento}}</oper:documento>\n            <oper:nombres>{{nombres}}</oper:nombres>\n        <oper:email>{{email}}</oper:email>\n        <oper:celular>{{celular}}</oper:celular>\n        </oper:RegistrarCliente>\n    </soapenv:Body>\n</soapenv:Envelope>"
+					"raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:oper=\"{{domain}}/soap/epayco/server\">\n    <soapenv:Header/>\n    <soapenv:Body>\n        <oper:RegistrarCliente>\n            <oper:user>{{user}}</oper:user>\n            <oper:token>{{token}}</oper:token>\n            <oper:documento>{{documento}}</oper:documento>\n            <oper:nombres>{{nombres}}</oper:nombres>\n            <oper:email>{{email}}</oper:email>\n            <oper:celular>{{celular}}</oper:celular>\n            <oper:password>testpass</oper:password>\n        </oper:RegistrarCliente>\n    </soapenv:Body>\n</soapenv:Envelope>"
+				},
+				"url": {
+					"raw": "{{domain}}/soap/epayco/server",
+					"host": [
+						"{{domain}}"
+					],
+					"path": [
+						"soap",
+						"epayco",
+						"server"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Buscar Cliente por Documento",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:oper=\"{{domain}}/soap/epayco/server\">\r\n    <soapenv:Header/>\r\n    <soapenv:Body>\r\n        <oper:BuscarClientesDOCUMENTO>\r\n            <oper:user>{{user}}</oper:user>\r\n            <oper:token>{{token}}</oper:token>\r\n            <oper:documento>V17166045</oper:documento>\r\n        </oper:BuscarClientesDOCUMENTO>\r\n    </soapenv:Body>\r\n</soapenv:Envelope>"
+				},
+				"url": {
+					"raw": "{{domain}}/soap/epayco/server",
+					"host": [
+						"{{domain}}"
+					],
+					"path": [
+						"soap",
+						"epayco",
+						"server"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Buscar Cliente por Email",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:oper=\"{{domain}}/soap/epayco/server\">\r\n    <soapenv:Header/>\r\n    <soapenv:Body>\r\n        <oper:BuscarClientesEMAIL>\r\n            <oper:user>{{user}}</oper:user>\r\n            <oper:token>{{token}}</oper:token>\r\n            <oper:email>{{email}}</oper:email>\r\n        </oper:BuscarClientesEMAIL>\r\n    </soapenv:Body>\r\n</soapenv:Envelope>"
+				},
+				"url": {
+					"raw": "{{domain}}/soap/epayco/server",
+					"host": [
+						"{{domain}}"
+					],
+					"path": [
+						"soap",
+						"epayco",
+						"server"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Buscar Billetera por Hash",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:oper=\"{{domain}}/soap/epayco/server\">\r\n    <soapenv:Header/>\r\n    <soapenv:Body>\r\n        <oper:BuscarBilleteraHASH>\r\n            <oper:user>{{user}}</oper:user>\r\n            <oper:token>{{token}}</oper:token>\r\n            <oper:hash>Epayco-USD-61ee02df4da9e9.73947044</oper:hash>\r\n        </oper:BuscarBilleteraHASH>\r\n    </soapenv:Body>\r\n</soapenv:Envelope>"
 				},
 				"url": {
 					"raw": "{{domain}}/soap/epayco/server",
@@ -115,34 +202,66 @@
 			"response": []
 		}
 	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
 	"variable": [
 		{
-			"id": "095ec8cd-48c6-46ea-81ea-e2c9831f75e2",
 			"key": "domain",
 			"value": "http://localhost",
-			"type": "string",
-			"description": ""
+			"type": "string"
 		},
 		{
-			"id": "8014ce93-723b-400f-86b9-f9d19f7c36ed",
 			"key": "user",
 			"value": "soapsvr@epaycotest.com",
-			"type": "string",
-			"description": ""
+			"type": "string"
 		},
 		{
-			"id": "b39902dc-5edf-4e7a-8b74-7c7d285d30dc",
 			"key": "password",
 			"value": "soaptestPass",
-			"type": "string",
-			"description": ""
+			"type": "string"
 		},
 		{
-			"id": "4f4496dd-5939-4b8f-b9c3-b1a4deb94608",
 			"key": "token",
 			"value": "tGSGYv8al1Ce6Rui8oa4Kjo8ADhYvR9x8KFZOeEGWgU1iscF7N2tUnI3t9bX",
-			"type": "string",
-			"description": ""
+			"type": "string"
+		},
+		{
+			"key": "documento",
+			"value": "V17166045",
+			"type": "string"
+		},
+		{
+			"key": "nombres",
+			"value": "Freddy Campos",
+			"type": "string"
+		},
+		{
+			"key": "email",
+			"value": "marthianfred@gmail.com",
+			"type": "string"
+		},
+		{
+			"key": "celular",
+			"value": "+584248144402",
+			"type": "string"
 		}
 	]
 }

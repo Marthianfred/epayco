@@ -44,6 +44,7 @@ class EpaycoService
      * @param string $nombres
      * @param string $email
      * @param string $celular
+     * @param string $password
      *
      * @return array // [Status, msg, cliente]
      * @throws SoapFault // Error Genrado Automatico.. u Manual
@@ -54,7 +55,8 @@ class EpaycoService
         string $documento,
         string $nombres,
         string $email,
-        string $celular
+        string $celular,
+        string $password
     ):array
     {
         if ($token != Provider::getToken($user)){
@@ -62,7 +64,7 @@ class EpaycoService
             throw new SoapFault('SOAP-ENV:Client', 'Error en Credenciales');
         }
 
-        $rc = Provider::RegistrarCliente($documento, $nombres, $email, $celular);
+        $rc = Provider::RegistrarCliente($documento, $nombres, $email, $celular, $password);
 
         if ($rc['status'])
         {

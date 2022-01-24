@@ -66,10 +66,10 @@ class Clientes extends \App\Entities\Clientes implements \Doctrine\ORM\Proxy\Pro
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', 'id', '' . "\0" . 'App\\Entities\\Clientes' . "\0" . 'documento', '' . "\0" . 'App\\Entities\\Clientes' . "\0" . 'nombres', '' . "\0" . 'App\\Entities\\Clientes' . "\0" . 'email', '' . "\0" . 'App\\Entities\\Clientes' . "\0" . 'celular', '' . "\0" . 'App\\Entities\\Clientes' . "\0" . 'billeteras'];
+            return ['__isInitialized__', 'id', '' . "\0" . 'App\\Entities\\Clientes' . "\0" . 'documento', '' . "\0" . 'App\\Entities\\Clientes' . "\0" . 'nombres', '' . "\0" . 'App\\Entities\\Clientes' . "\0" . 'email', '' . "\0" . 'App\\Entities\\Clientes' . "\0" . 'celular', '' . "\0" . 'App\\Entities\\Clientes' . "\0" . 'billeteras', 'password'];
         }
 
-        return ['__isInitialized__', 'id', '' . "\0" . 'App\\Entities\\Clientes' . "\0" . 'documento', '' . "\0" . 'App\\Entities\\Clientes' . "\0" . 'nombres', '' . "\0" . 'App\\Entities\\Clientes' . "\0" . 'email', '' . "\0" . 'App\\Entities\\Clientes' . "\0" . 'celular', '' . "\0" . 'App\\Entities\\Clientes' . "\0" . 'billeteras'];
+        return ['__isInitialized__', 'id', '' . "\0" . 'App\\Entities\\Clientes' . "\0" . 'documento', '' . "\0" . 'App\\Entities\\Clientes' . "\0" . 'nombres', '' . "\0" . 'App\\Entities\\Clientes' . "\0" . 'email', '' . "\0" . 'App\\Entities\\Clientes' . "\0" . 'celular', '' . "\0" . 'App\\Entities\\Clientes' . "\0" . 'billeteras', 'password'];
     }
 
     /**
@@ -205,12 +205,12 @@ class Clientes extends \App\Entities\Clientes implements \Doctrine\ORM\Proxy\Pro
     /**
      * {@inheritDoc}
      */
-    public function setDocumento($documento)
+    public function setDocumento($documento): void
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setDocumento', [$documento]);
 
-        return parent::setDocumento($documento);
+        parent::setDocumento($documento);
     }
 
     /**
@@ -227,12 +227,12 @@ class Clientes extends \App\Entities\Clientes implements \Doctrine\ORM\Proxy\Pro
     /**
      * {@inheritDoc}
      */
-    public function setNombres($nombres)
+    public function setNombres($nombres): void
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setNombres', [$nombres]);
 
-        return parent::setNombres($nombres);
+        parent::setNombres($nombres);
     }
 
     /**
@@ -249,12 +249,12 @@ class Clientes extends \App\Entities\Clientes implements \Doctrine\ORM\Proxy\Pro
     /**
      * {@inheritDoc}
      */
-    public function setEmail($email)
+    public function setEmail($email): void
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setEmail', [$email]);
 
-        return parent::setEmail($email);
+        parent::setEmail($email);
     }
 
     /**
@@ -271,12 +271,12 @@ class Clientes extends \App\Entities\Clientes implements \Doctrine\ORM\Proxy\Pro
     /**
      * {@inheritDoc}
      */
-    public function setCelular($celular)
+    public function setCelular($celular): void
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setCelular', [$celular]);
 
-        return parent::setCelular($celular);
+        parent::setCelular($celular);
     }
 
     /**
@@ -293,23 +293,45 @@ class Clientes extends \App\Entities\Clientes implements \Doctrine\ORM\Proxy\Pro
     /**
      * {@inheritDoc}
      */
-    public function AgragarBilletera(\App\Entities\Billeteras $billetera)
+    public function AgragarBilletera(\App\Entities\Billeteras $billetera): void
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'AgragarBilletera', [$billetera]);
 
-        return parent::AgragarBilletera($billetera);
+        parent::AgragarBilletera($billetera);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setBilleteras(\App\Entities\Billeteras $b)
+    public function setBilleteras(\App\Entities\Billeteras $b): void
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setBilleteras', [$b]);
 
-        return parent::setBilleteras($b);
+        parent::setBilleteras($b);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getPassword()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getPassword', []);
+
+        return parent::getPassword();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setPassword($password): void
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setPassword', [$password]);
+
+        parent::setPassword($password);
     }
 
 }
